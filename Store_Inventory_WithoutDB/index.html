@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Inventory</title>
+  <style>  /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+  }
+  
+  /* Styling the Body */
+  body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100%;
+      background-color: #f4f4f4;
+  }
+  
+  /* Top Navigation Bar Styling */
+  .topbar {
+      width: 100%;
+      background: linear-gradient(90deg, #ff9c15, #47915b);
+      color: white;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+  }
+  
+  .logo a {
+      color: black;
+      font-weight: 900;
+      padding: 10px 20px;
+      text-decoration: none;
+  }
+  
+  .auth-links a {
+      color: black;
+      font-weight: 900;
+      padding: 10px 20px;
+      text-decoration: none;
+  }
+  
+  .auth-links a:hover {
+      background-color: #575757;
+  }
+  
+  /* Sidebar Styling */
+  .sidebar {
+      width: 20%;
+      /* background-color: #333; */
+      background-color: #c0c0c0;
+      color: white;
+      padding: 20px;
+      position: fixed;
+      top: 50px;
+      left: 0;
+      height: calc(100% - 50px);
+      overflow: auto;
+  }
+  
+  /* Sidebar Links */
+  .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+  }
+  
+  .sidebar ul li {
+      margin: 15px 0;
+  }
+  
+  .sidebar ul li a {
+      color: black;
+      font-weight: 900;
+      text-decoration: none;
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+  }
+  
+  .sidebar ul li a:hover {
+      background-color: #575757;
+  }
+  
+  .mainContent {
+      height: 100%;
+      margin-left: 20%;
+      padding: 20px;
+      width: 80%;
+      margin-top: 70px;
+      background-color: #f4f4f4;
+  }
+  
+  h2{
+      margin-top: 1.5rem;
+  }
+  
+  /* Form table styling */
+  .form-table {
+      margin-bottom: 20px;
+  }
+  
+  .form-table table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+  
+  .form-table th,
+  .form-table td {
+      padding: 8px;
+      text-align: center;
+  }
+  
+  .form-table th {
+      background-color: transparent;
+      font-weight: bold;
+      border: none;
+  }
+  
+  .form-table td {
+      border: none;
+  }
+  
+  /* Input and select styles */
+  input,
+  select {
+      width: 90%;
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+  }
+  
+  input[type="date"] {
+      width: 100%;
+  }
+  
+  /* Add button styling */
+  button.add-button {
+      /* margin-left: 1rem; */
+      /* margin-right: 1rem; */
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 100%;
+  }
+  
+  button.edit-button {
+      background-color: #2831a7;
+  }
+  
+  button.delete-button {
+      background-color: #a72828;
+  }
+  
+  button.add-button:hover {
+      background-color: #218838;
+  }
+  
+  /* Inventory table styling */
+  table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+  }
+  
+  th,
+  td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+  }
+  
+  th {
+      background-color: #948c8c;
+      font-weight: bold;
+  }
+  
+  /* Total row styling */
+  .total-row {
+      font-weight: bold;
+      background-color: #ddd;
+  }
+  
+  /* Hide content sections by default */
+  .content {
+      display: none;
+      height: 80vh;
+      /* Adjust height as per your need */
+      overflow-y: auto;
+      /* Enable vertical scrolling */
+  }
+  
+  /* Show content when active */
+  .content.active {
+      display: block;
+  }
+  
+  
+  .cards {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 40px;
+  }
+  
+  .card {
+      background-color: white;
+      padding: 50px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 350px;
+      text-align: center;
+  }
+  
+  .card h3 {
+      font-size: 1.3em;
+      margin-bottom: 10px;
+      color: #333;
+  }
+  
+  .card .value {
+      font-size: 1.5em;
+      color: green;
+      font-weight: bold;
+  }
+  
+  button {
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+  }
+  
+  button:hover {
+      background-color: #555;
+  }
+  
+  #footer {
+      background: linear-gradient(90deg, #ff9c15, #47915b);
+      width: 100%;
+      height: 7vh;
+      position: fixed;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  
+  #footer div {
+      width: 90%;
+      display: flex;
+      justify-content: space-between;
+      padding-top: 1vh;
+  }
+  
+  #footer p {
+      font-size: 15px;
+      font-weight: 700;
+      color: black;
+  }   
+  </style>
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content').forEach((section) => {
+                section.style.display = 'none';
+            });
+
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        // // Load the Buy section by default when the page loads
+        window.onload = function () {
+            showSection('buy');
+        };
+
+        function handleFormSubmit(event, sectionId) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // For demonstration, simply log the values to the console
+            const formData = new FormData(event.target);
+            console.log("Form submitted!", Object.fromEntries(formData));
+
+            // Redirect to the appropriate section based on which form was submitted
+            showSection(sectionId);
+
+            // Optionally, you can refresh the inventory table or provide feedback to the user
+            alert("Item added successfully!"); // Just an example message
+        }
+    </script>
+</head>
+
+<body>
+
+    <!-- Top Navigation Bar -->
+    <div class="topbar">
+        <div class="logo">
+            <a href="index.html">SBS P/L</a>
+            <!-- <img src="SBS.png" alt=""> -->
+        </div>
+        <div class="auth-links">
+            <!-- <a href="#signin">Sign In</a>
+            <a href="#signup">Sign Up</a> -->
+        </div>
+    </div>
+
+    <!-- Left Sidebar Navigation -->
+    <div class="sidebar">
+        <h3 style="font-size:35px;">Controls</h3>
+        <ul>
+            <li><a onclick="showSection('buy')">Buy</a></li>
+            <li><a onclick="showSection('sell')">Sell</a></li>
+            <li><a onclick="showSection('profit-loss')">profit-loss</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="mainContent">
+        <!-- Content for Buying-->
+        <div class="content" id="buy">
+            <div class="container" id="buy-section">
+                <h1>Store Inventory - Buy Section</h1>
+                <!-- Form and table for Buy Section -->
+                <form method="POST" action="/add-item">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Item</th>
+                                <th>Quantity(kg/lt)</th>
+                                <th>Price per Unit (₹)</th>
+                                <!-- <th>Total price per Item</th> -->
+                                <th>Add Item</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="date" id="date" name="date" required></td>
+                                <td>
+                                    <select id="item" name="item">
+                                        <option value="Rice">Rice</option>
+                                        <option value="Dal">Dal</option>
+                                        <option value="Oil">Oil</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" id="quantity" name="quantity" placeholder="Enter quantity"
+                                        required></td>
+                                <td><input type="number" id="price" name="price" placeholder="Enter price" required>
+                                </td>
+                                <!-- <td>Auto-calculated</td> -->
+                                <td><button type="submit" class="add-button">Add Item</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+
+                <h2>Inventory List</h2>
+                <table id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Quantity(kg/lt)</th>
+                            <th>Price per Unit</th>
+                            <th>Total Price (₹)</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Inventory}}
+                        <tr>
+                            <td>{{.Date}}</td>
+                            <td>{{.Item}}</td>
+                            <td>{{.Quantity}}</td>
+                            <td>₹{{.PricePerUnit}}</td>
+                            <td>₹{{.TotalPriceBuying}}</td>
+                            <td>
+                                    <button type="submit" class="delete-button">Delete</button>
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="4">Total Price of All Items</td>
+                            <td id="totalPriceSum">₹{{.TotalPriceAllItems}}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Content for Selling-->
+        <div class="content" id="sell">
+            <div class="container" id="sell-section">
+                <h1>Selling Inventory - Sell Section</h1>
+                <!-- Form and table for Sell Section -->
+                <form method="POST" action="/add-item-selling">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Item</th>
+                                <th>Quantity(kg/lt)</th>
+                                <th>Price per Unit (₹)</th>
+                                <!-- <th>Total price per Item</th> -->
+                                <th>Add Item</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="date" id="date" name="date" required></td>
+                                <td>
+                                    <select id="item" name="item">
+                                        <option value="Rice">Rice</option>
+                                        <option value="Dal">Dal</option>
+                                        <option value="Oil">Oil</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" id="quantity" name="quantity" placeholder="Enter quantity"
+                                        required></td>
+                                <td><input type="number" id="price" name="price" placeholder="Enter price" required>
+                                </td>
+                                <!-- <td>Auto-calculated</td> -->
+                                <td><button type="submit" class="add-button">Add Item</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                <h2>Inventory List</h2>
+                <table id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Price per Unit(kg/lt)</th>
+                            <th>Total Price (₹)</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .SellingInventory}}
+                        <tr>
+                            <td>{{.Date}}</td>
+                            <td>{{.Item}}</td>
+                            <td>{{.Quantity}}</td>
+                            <td>₹{{.PricePerUnit}}</td>
+                            <td>₹{{.TotalPriceSelling}}</td>
+                            <td>
+                                <button type="submit" class="delete-button">Delete</button>
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="4">Total Price of All Items</td>
+                            <td id="totalPriceSum">₹{{.TotalPriceAllSelling}}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Profit/Loss Section -->
+        <div class="content" id="profit-loss">
+            <h1>Profit/Loss Overview</h1>
+            <div class="container">
+                <div class="cards">
+                    <div class="card">
+                        <h3>Total Buy Price</h3>
+                        <div id="buyPrice" class="value">₹{{.TotalPriceAllItems}}</div>
+                    </div>
+                    <div class="card">
+                        <h3>Total Sell Price</h3>
+                        <div id="sellPrice" class="value">₹{{.TotalPriceAllSelling}}</div>
+                    </div>
+                    <div class="card">
+                        <h3>Profit/Loss</h3>
+                        <div id="profitLoss" class="value">₹{{.TotalProfitLoss}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="content" id="contact">
+            <h1>Contact Us</h1>
+            <p>Get in touch for more information.</p>
+        </div>
+    </div>
+
+
+    <div id="footer">
+        <div>
+            <p>SBS P/L Inventory System</p>
+            <p>Created By: Tirtha Sahu</p>
+        </div>
+    </div>
+
+    <script>
+        function calculateProfitLoss() {
+            // Get the total buy and sell prices from the HTML template variables
+            const totalBuyPrice = parseFloat("{{.TotalPriceAllItems}}");
+            const totalSellPrice = parseFloat("{{.TotalPriceAllSelling}}");
+
+            // Calculate the profit or loss
+            const profitLoss = totalSellPrice - totalBuyPrice;
+
+            // Update the displayed profit/loss value in the correct color
+            const profitLossElement = document.getElementById('profitLoss');
+            profitLossElement.innerHTML = `₹${profitLoss.toFixed(2)}`;
+
+            // If it's profit (positive value), show it in green; if loss (negative), show it in red
+            if (profitLoss >= 0) {
+                profitLossElement.style.color = "green";
+            } else {
+                profitLossElement.style.color = "red";
+            }
+        }
+
+        // Automatically calculate and display profit/loss after page load
+        window.onload = function () {
+            calculateProfitLoss();
+        };
+    </script>
+
+    <script>
+        // Show Buy section by default when the page loads
+        showSection('buy');
+    </script>
+</body>
+
+</html>
